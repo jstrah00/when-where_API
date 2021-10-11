@@ -1,12 +1,9 @@
-import os
 import pymongo
-
-connection_url = "mongodb://localhost:27017/" #Develop
-#connection_url = os.getenv("DB_CONN") #Prod
+from app.resources.credentials import DB_CONNECTION_URL
 
 class Database:
     def __init__(self): 
-        myclient = pymongo.MongoClient(connection_url)
+        myclient = pymongo.MongoClient(DB_CONNECTION_URL)
         self.db = myclient['whenwhere']
 
     def create_user(self, email: str, first_name: str, last_name: str, hashed_password: str) -> None:

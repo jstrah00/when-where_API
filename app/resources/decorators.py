@@ -1,21 +1,36 @@
 from flask import request, jsonify
-import jwt
-from app.controller.controller import JWT_SECRET
 from functools import wraps
+import jwt
+from jwt.exceptions import InvalidSignatureError
+from app.resources.exceptions import BadAuthorizationException
+from app.resources.credentials import JWT_SECRET
 
 def token_required(f):
    @wraps(f)
    def decorator(*args, **kwargs):
        token = None
-       if 'x-access-token' in request.headers:
-           token = request.headers['x-access-token']
- 
+       if "x-access-token" in request.headers:
+           token = request.headers["x-access-token"]
        if not token:
-           return jsonify({'message': 'a valid token is missing'})
+           raise BadAuthorizationException("Authorization token is missing")
        try:
            jwt.decode(token, JWT_SECRET, algorithms=["HS256"])
-       except:
-           return jsonify({'message': 'token is invalid'})
- 
+       except InvalidSignatureError:
+           raise BadAuthorizationException("Invalid token")
        return f(*args, **kwargs)
    return decorator
+
+def basic_decorator(f):
+    @wraps(f)
+    def wrapper(*args, **kwargs):
+        try:
+            result = f(*args, **kwargs)
+            return jsonify({"data":result})
+        except Exception as e:
+            print(" - Error: " + str(e))
+            if "get_status_code" in dir(e):
+                if e.get_status_code() == 500: return jsonify({"Desc": "There was an error"}), 500
+                else: return jsonify({"Desc": str(e)}), e.get_status_code()
+            else:
+                return jsonify({"Desc": "There was an error"}), 500
+    return wrapper
