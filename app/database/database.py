@@ -1,10 +1,10 @@
 import pymongo
-from app.resources.credentials import DB_CONNECTION_URL
+from app.resources.credentials import DB_CONNECTION_URL, DB_NAME
 
 class Database:
     def __init__(self): 
         myclient = pymongo.MongoClient(DB_CONNECTION_URL)
-        self.db = myclient['whenwhere']
+        self.db = myclient[DB_NAME]
 
     def create_user(self, email: str, first_name: str, last_name: str, hashed_password: str) -> None:
         self.db.users.insert_one({
