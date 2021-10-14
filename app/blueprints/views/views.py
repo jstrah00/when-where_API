@@ -39,3 +39,4 @@ def restricted_ping():
     """Ping endpoint, used to know if the app is up."""
 
     return "pong"
+
