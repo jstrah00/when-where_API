@@ -4,6 +4,7 @@ import jwt
 from jwt.exceptions import InvalidSignatureError
 from app.resources.exceptions import BadAuthorizationException
 from app.resources.credentials import JWT_SECRET
+from app.resources.logs import logger
 
 def token_required(f):
    @wraps(f)
@@ -27,10 +28,11 @@ def basic_decorator(f):
             result = f(*args, **kwargs)
             return jsonify({"data":result})
         except Exception as e:
-            print(" - Error: " + str(e))
+            logger.exception("Exception raised.")
             if "get_status_code" in dir(e):
                 if e.get_status_code() == 500: return jsonify({"Desc": "There was an error"}), 500
                 else: return jsonify({"Desc": str(e)}), e.get_status_code()
             else:
                 return jsonify({"Desc": "There was an error"}), 500
     return wrapper
+
