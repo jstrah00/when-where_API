@@ -16,3 +16,7 @@ class Database:
 
     def get_user_data_by_email(self, email: str):
         return self.db.users.find_one({"email": email})
+
+    def get_users(self):
+        return self.db["users"].find()
+

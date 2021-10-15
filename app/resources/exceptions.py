@@ -21,3 +21,9 @@ class InvalidRequestException(Exception):
         self.__status_code = 400
     def get_status_code(self) -> int:
         return self.__status_code
+
+class UnauthorizedAccessException(Exception):
+    def __init__(self, message: str = "You are not authorized to access to this resource") -> None:
+        self.__status_code = 401
+    def get_status_code(self) -> int:
+        return self.__status_code
