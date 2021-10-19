@@ -27,3 +27,4 @@ class UnauthorizedAccessException(Exception):
         self.__status_code = 401
     def get_status_code(self) -> int:
         return self.__status_code
+

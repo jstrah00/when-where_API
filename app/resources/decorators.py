@@ -1,10 +1,10 @@
 from flask import request, jsonify
 from functools import wraps
 import jwt
-from jwt.exceptions import InvalidSignatureError
+from jwt.exceptions import InvalidSignatureError, ExpiredSignatureError
 from app.resources.exceptions import BadAuthorizationException, UnauthorizedAccessException
 from app.resources.credentials import JWT_SECRET
-from app.resources.logs import logger
+from app.resources.logger import logger
 
 def token_required(f):
    @wraps(f)
@@ -18,6 +18,8 @@ def token_required(f):
            jwt.decode(token, JWT_SECRET, algorithms=["HS256"])
        except InvalidSignatureError:
            raise BadAuthorizationException("Invalid token")
+       except ExpiredSignatureError:
+           raise BadAuthorizationException("Expired token")
        return f(*args, **kwargs)
    return decorator
 

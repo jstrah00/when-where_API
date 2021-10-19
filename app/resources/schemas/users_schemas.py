@@ -107,3 +107,69 @@ authenticate_user_schema = {
     },
     "additionalProperties": True
 }
+
+update_user_schema = {
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "$id": "http://example.com/example.json",
+    "type": "object",
+    "title": "The root schema",
+    "description": "The root schema comprises the entire JSON document.",
+    "default": {},
+    "examples": [
+        {
+            "email": "julianstrah@gmail.com",
+            "first_name": "Juli",
+            "last_name": "Strah",
+            "role": "admin"
+        }
+    ],
+    "required": [
+        "email",
+        "first_name",
+        "last_name",
+        "role"
+    ],
+    "properties": {
+        "email": {
+            "$id": "#/properties/email",
+            "type": "string",
+            "title": "The email schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": "",
+            "examples": [
+                "julianstrah@gmail.com"
+            ]
+        },
+        "first_name": {
+            "$id": "#/properties/first_name",
+            "type": "string",
+            "title": "The first_name schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": "",
+            "examples": [
+                "Juli"
+            ]
+        },
+        "last_name": {
+            "$id": "#/properties/last_name",
+            "type": "string",
+            "title": "The last_name schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": "",
+            "examples": [
+                "Strah"
+            ]
+        },
+        "role": {
+            "$id": "#/properties/role",
+            "type": "string",
+            "title": "The role schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": "",
+            "examples": [
+                "admin"
+            ]
+        }
+    },
+    "additionalProperties": True
+}

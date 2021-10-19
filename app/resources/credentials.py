@@ -1,6 +1,7 @@
 import os
+from app.resources.logger import logger
 
-print(f"Running on {os.getenv('ENV')} enviroment.")
+logger.info(f"Running on {os.getenv('ENV')} enviroment.")
 
 if os.getenv("ENV") == "production":
     DB_CONNECTION_URL = os.getenv("DB_CONN")
