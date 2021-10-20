@@ -6,3 +6,4 @@ def validate_json_schema(json_data, schema):
         validate(json_data,schema)
     except exceptions.ValidationError:
         raise InvalidRequestException("Invalid json data")
+
