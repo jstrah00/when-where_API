@@ -1,5 +1,5 @@
 """Module designated for all no jobs endpoints V1"""
-from app.resources.decorators import token_required, basic_decorator, admin_required
+from app.resources.decorators import token_required, basic_decorator, required_roles
 from flask import Blueprint, request
 import app
 from app.resources.utilities import validate_json_schema
@@ -39,7 +39,7 @@ def create_user():
 @views.route("/users", methods=["GET"])
 @basic_decorator
 @token_required
-@admin_required
+@required_roles(['admin','self']) #ojo q aca no corresponde el self
 def get_users():
     """Get all users"""
     return app.controller.get_users()
@@ -47,7 +47,7 @@ def get_users():
 @views.route("/users/<string:email>/email", methods=["GET"])
 @basic_decorator
 @token_required
-@admin_required
+@required_roles(['admin','self'])
 def get_user_by_email(email):
     """Get user data by email"""
     return app.controller.get_user_data_by_email(email)
@@ -55,7 +55,7 @@ def get_user_by_email(email):
 @views.route("/users/<string:email>/email", methods=["PUT"])
 @basic_decorator
 @token_required
-@admin_required
+@required_roles(['admin','self'])
 def update_user(email):
     """Update user data by email"""
     json_data = request.get_json(force = True)

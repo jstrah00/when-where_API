@@ -1,6 +1,5 @@
 """Flask app creation."""
 
-import app.config
 from flask import Flask
 from app.blueprints.ping import ping
 from app.blueprints.views import views
