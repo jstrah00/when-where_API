@@ -19,7 +19,7 @@ class WWController:
                 "email": user_data["email"],
                 "first_name": user_data["first_name"],
                 "last_name": user_data["last_name"],
-                "role": user_data["role"],
+                "roles": user_data["roles"],
                 "exp" : datetime.datetime.utcnow() + datetime.timedelta(minutes=45)
                 }, JWT_SECRET, "HS256")
             self.update_last_login(user_data["email"])
@@ -48,7 +48,7 @@ class WWController:
                 "email": user["email"],
                 "first_name": user["first_name"],
                 "last_name": user["last_name"],
-                "role": user["role"],
+                "roles": user["roles"],
                 "last_login": user["last_login"]
                 }
 
