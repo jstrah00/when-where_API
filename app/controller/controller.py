@@ -34,7 +34,7 @@ class WWController:
         password_hash = bcrypt.hashpw(password, bcrypt.gensalt())
         last_login = datetime.datetime.now()
         self.database.create_user(
-                json_data["email"], json_data["name"], json_data["last_name"], password_hash, last_login)
+                json_data["email"], json_data["name"], json_data["last_name"], password_hash, json_data["roles"], last_login)
         return "User created successfully"
 
     def update_last_login(self, email: str):

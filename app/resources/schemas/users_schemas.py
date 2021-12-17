@@ -7,17 +7,21 @@ create_user_schema = {
     "default": {},
     "examples": [
         {
-            "email": "julianstrah2@gmail.com",
+            "email": "julianstrahdd@gmail.com",
             "name": "Julian",
             "last_name": "Strah",
-            "password": "Contrasena123"
+            "password": "MiliTeAmo",
+            "roles": [
+                "user"
+            ]
         }
     ],
     "required": [
         "email",
         "name",
         "last_name",
-        "password"
+        "password",
+        "roles"
     ],
     "properties": {
         "email": {
@@ -26,9 +30,8 @@ create_user_schema = {
             "title": "The email schema",
             "description": "An explanation about the purpose of this instance.",
             "default": "",
-            "pattern": "^\S+@\S+\.\S+$",
             "examples": [
-                "julianstrah2@gmail.com"
+                "julianstrahdd@gmail.com"
             ]
         },
         "name": {
@@ -57,10 +60,37 @@ create_user_schema = {
             "title": "The password schema",
             "description": "An explanation about the purpose of this instance.",
             "default": "",
-            "minLength": 6,
             "examples": [
-                "Contrasena123"
+                "MiliTeAmo"
             ]
+        },
+        "roles": {
+            "$id": "#/properties/roles",
+            "type": "array",
+            "title": "The roles schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": [],
+            "examples": [
+                [
+                    "user"
+                ]
+            ],
+            "additionalItems": True,
+            "items": {
+                "$id": "#/properties/roles/items",
+                "anyOf": [
+                    {
+                        "$id": "#/properties/roles/items/anyOf/0",
+                        "type": "string",
+                        "title": "The first anyOf schema",
+                        "description": "An explanation about the purpose of this instance.",
+                        "default": "",
+                        "examples": [
+                            "user"
+                        ]
+                    }
+                ]
+            }
         }
     },
     "additionalProperties": True
