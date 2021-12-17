@@ -6,13 +6,26 @@ class Database:
         myclient = pymongo.MongoClient(DB_CONNECTION_URL)
         self.db = myclient[DB_NAME]
 
-    def create_user(self, email: str, first_name: str, last_name: str, hashed_password: str) -> None:
+    def create_user(
+            self, email: str, first_name: str, last_name: str, hashed_password: str, roles, last_login
+            ) -> None:
         self.db.users.insert_one({
             "email": email,
             "first_name": first_name,
             "last_name": last_name,
-            "hashed_password": hashed_password
+            "hashed_password": hashed_password,
+            "roles": roles,
+            "last_login": last_login
             })
 
     def get_user_data_by_email(self, email: str):
         return self.db.users.find_one({"email": email})
+
+    def get_users(self):
+        return self.db.users.find()
+    
+    def update_user_data(self, email:str, payload:dict):
+        return self.db.users.update_one(
+                {"email": email},
+                {"$set": payload})
+
