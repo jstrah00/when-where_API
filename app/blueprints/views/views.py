@@ -4,6 +4,7 @@ from flask import Blueprint, request
 import app
 from app.resources.utilities import validate_json_schema
 from app.resources.schemas.users_schemas import create_user_schema, authenticate_user_schema, update_user_schema
+from app.resources.schemas.roles_schemas import create_role_schema
 
 views = Blueprint("views", __name__)
 
@@ -62,3 +63,26 @@ def update_user(email):
     validate_json_schema(json_data, update_user_schema)
     return app.controller.update_user(email, json_data)
 
+@views.route("/roles", methods=["POST"])
+@basic_decorator
+def create_role():
+    """Create user"""
+    json_data = request.get_json(force = True)
+    validate_json_schema(json_data, create_role_schema)
+    return app.controller.create_role(json_data)
+
+@views.route("/roles", methods=["GET"])
+@basic_decorator
+@token_required
+@roles_required(["admin"])
+def get_roles():
+    """Get all roles"""
+    return app.controller.get_roles()
+
+@views.route("/roles/<string:name>", methods=["GET"])
+@basic_decorator
+@token_required
+@roles_required(["admin"])
+def get_role_by_name(name):
+    """Get user data by email"""
+    return app.controller.get_role_data_by_name(name)

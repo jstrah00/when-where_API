@@ -26,7 +26,7 @@ class WWController:
             return {"token" : token}
         return "Invalid username or password"
 
-    def create_user(self, json_data: dict): 
+    def create_role(self, json_data: dict): 
         """Main fuction for create user endpoint"""
         if self.database.get_user_data_by_email(json_data["email"]):
             raise ResourceAlreadyExistsException("User already exists")
@@ -73,4 +73,36 @@ class WWController:
         """Main function for update user data endpoint"""
         self.database.update_user_data(email, json_data)
         return "User updated successfully"
+
+#Roles
+
+    def create_user(self, json_data: dict): 
+        """Main fuction for create role endpoint"""
+        if self.database.get_role_data_by_name(json_data["name"]):
+            raise ResourceAlreadyExistsException("Role already exists")
+        self.database.create_role(json_data["name"], json_data["description"])
+        return "Role created successfully"
+
+    def build_role_dict(self, role: dict):
+            return {
+                "name": role["name"],
+                "description": role["description"]
+                }
+
+    def build_get_roles_response(self, roles: list) -> list:
+        """Function for building the get_roles endpoint response"""
+        response = []
+        for role in roles:
+            response.append(self.build_role_dict(role))
+        return response
+
+    def get_roles(self):
+        """Main function for get roles endpoint"""
+        roles = list(self.database.get_roles())
+        return self.build_get_roles_response(roles)
+
+    def get_role_data_by_name(self, name:str):
+        """Main function for get user data by email endpoint"""
+        response = self.database.get_role_data_by_name(name)
+        return self.build_role_dict(response)
 

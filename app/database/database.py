@@ -29,3 +29,14 @@ class Database:
                 {"email": email},
                 {"$set": payload})
 
+    def create_role(self, name: str, description: str) -> None:
+        self.db.roles.insert_one({
+            "name": name,
+            "description": description
+            })
+
+    def get_single_role(self, name: str):
+        return self.db.roles.find_one({"name": name})
+
+    def get_roles(self):
+        return self.db.roles.find()
