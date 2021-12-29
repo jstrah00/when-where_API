@@ -38,15 +38,19 @@ def basic_decorator(f):
                 return jsonify({"Desc": "There was an error"}), 500
     return wrapper
 
-def admin_required(f):
-   @wraps(f)
-   def decorator(*args, **kwargs):
-       try:
-           jwt_data = jwt.decode(request.headers["x-access-token"], JWT_SECRET, algorithms=["HS256"])
-           if jwt_data["role"] != "admin":
-               raise UnauthorizedAccessException("You are not authorized to access to this resource")
-       except InvalidSignatureError:
-           raise BadAuthorizationException("Invalid token")
-       return f(*args, **kwargs)
-   return decorator
+def roles_required(roles):
+   def roles_decorator(func):
+       @wraps(func)
+       def roles_wrapper(*args, **kwargs):
+           try:
+               jwt_data = jwt.decode(request.headers["x-access-token"], JWT_SECRET, algorithms=["HS256"])
+               if not list(set(jwt_data["roles"])&set(roles)):
+                   if "self" in roles and kwargs['email'] == jwt_data['email']: #only works if the called function has the email param
+                       return func(*args, **kwargs)
+                   raise UnauthorizedAccessException("You are not authorized to access to this resource")
+           except InvalidSignatureError:
+               raise BadAuthorizationException("Invalid token")
+           return func(*args, **kwargs)
+       return roles_wrapper
+   return roles_decorator
 

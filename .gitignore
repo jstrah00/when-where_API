@@ -131,3 +131,6 @@ dmypy.json
 
 .vim
 set_local_settings.py
+
+ww_env/
+.local_settings.py

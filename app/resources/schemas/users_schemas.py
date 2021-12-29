@@ -7,10 +7,10 @@ create_user_schema = {
     "default": {},
     "examples": [
         {
-            "email": "julianstrah2@gmail.com",
+            "email": "julianstrahdd@gmail.com",
             "name": "Julian",
             "last_name": "Strah",
-            "password": "Contrasena123"
+            "password": "MiliTeAmo"
         }
     ],
     "required": [
@@ -26,9 +26,8 @@ create_user_schema = {
             "title": "The email schema",
             "description": "An explanation about the purpose of this instance.",
             "default": "",
-            "pattern": "^\S+@\S+\.\S+$",
             "examples": [
-                "julianstrah2@gmail.com"
+                "julianstrahdd@gmail.com"
             ]
         },
         "name": {
@@ -57,9 +56,8 @@ create_user_schema = {
             "title": "The password schema",
             "description": "An explanation about the purpose of this instance.",
             "default": "",
-            "minLength": 6,
             "examples": [
-                "Contrasena123"
+                "MiliTeAmo"
             ]
         }
     },
