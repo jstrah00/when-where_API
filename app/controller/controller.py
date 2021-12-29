@@ -14,12 +14,12 @@ class WWController:
         if not user_data: 
             raise ResourceNotFoundException("User not found")
         password = json_data["password"].encode("utf-8")
-        if bcrypt.checkpw(password, user_data["hashed_password"]):
+        if user_data["status"] == "active" and bcrypt.checkpw(password, user_data["hashed_password"]):
             token = jwt.encode({
                 "email": user_data["email"],
                 "first_name": user_data["first_name"],
                 "last_name": user_data["last_name"],
-                "role": user_data["role"],
+                "roles": user_data["roles"],
                 "exp" : datetime.datetime.utcnow() + datetime.timedelta(minutes=45)
                 }, JWT_SECRET, "HS256")
             self.update_last_login(user_data["email"])
@@ -39,7 +39,6 @@ class WWController:
 
     def update_last_login(self, email: str):
         """Update user last login"""
-
         payload = {"last_login": datetime.datetime.now()}
         self.database.update_user_data(email, payload)
 
@@ -48,8 +47,9 @@ class WWController:
                 "email": user["email"],
                 "first_name": user["first_name"],
                 "last_name": user["last_name"],
-                "role": user["role"],
-                "last_login": user["last_login"]
+                "roles": user["roles"],
+                "last_login": user["last_login"],
+                "status": user["status"]
                 }
 
     def build_get_users_response(self, users: list) -> list:
@@ -71,6 +71,15 @@ class WWController:
 
     def update_user(self, email:str, json_data: dict): 
         """Main function for update user data endpoint"""
-        self.database.update_user_data(email, json_data)
+        allowed_keys = ["first_name", "last_name"] #Allowed propieties to update with this method
+        payload = dict((key,value) for key,value in json_data.items() if key in allowed_keys)
+        self.database.update_user_data(email, payload)
         return "User updated successfully"
+
+    def update_user_status(self, email:str, json_data: dict):
+        """Main function to update user status"""
+        self.database.update_user_data(email, json_data)
+        operation = "disabled" if json_data["status"] == "inactive" else "activated"
+        return f"User {operation} successfully"
+
 

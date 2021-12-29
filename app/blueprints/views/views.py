@@ -3,7 +3,7 @@ from app.resources.decorators import token_required, basic_decorator, admin_requ
 from flask import Blueprint, request
 import app
 from app.resources.utilities import validate_json_schema
-from app.resources.schemas.users_schemas import create_user_schema, authenticate_user_schema, update_user_schema
+from app.resources.schemas.users_schemas import create_user_schema, authenticate_user_schema, update_user_schema, update_user_status_schema
 
 views = Blueprint("views", __name__)
 
@@ -62,3 +62,12 @@ def update_user(email):
     validate_json_schema(json_data, update_user_schema)
     return app.controller.update_user(email, json_data)
 
+@views.route("/users/<string:email>/status", methods=["PUT"])
+@basic_decorator
+@token_required
+@admin_required
+def update_user_status(email):
+    """Update user status by email"""
+    json_data = request.get_json(force = True)
+    validate_json_schema(json_data, update_user_status_schema)
+    return app.controller.update_user_status(email, json_data)

@@ -14,7 +14,9 @@ class Database:
             "first_name": first_name,
             "last_name": last_name,
             "hashed_password": hashed_password,
-            "last_login": last_login
+            "last_login": last_login,
+            "roles": [],
+            "status": "active"
             })
 
     def get_user_data_by_email(self, email: str):
