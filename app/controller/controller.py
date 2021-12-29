@@ -2,7 +2,7 @@ import bcrypt
 import jwt
 import datetime
 from app.resources.credentials import JWT_SECRET
-from app.resources.exceptions import ResourceAlreadyExistsException, ResourceNotFoundException
+from app.resources.exceptions import ResourceAlreadyExistsException, ResourceNotFoundException, UnauthorizedAccessException
 
 class WWController:
     def __init__(self, database):
@@ -24,7 +24,7 @@ class WWController:
                 }, JWT_SECRET, "HS256")
             self.update_last_login(user_data["email"])
             return {"token" : token}
-        return "Invalid username or password"
+        raise UnauthorizedAccessException("Invalid username or password")
 
     def create_user(self, json_data: dict): 
         """Main fuction for create user endpoint"""
@@ -32,9 +32,8 @@ class WWController:
             raise ResourceAlreadyExistsException("User already exists")
         password = json_data["password"].encode("utf-8")
         password_hash = bcrypt.hashpw(password, bcrypt.gensalt())
-        last_login = datetime.datetime.now()
         self.database.create_user(
-                json_data["email"], json_data["name"], json_data["last_name"], password_hash, last_login)
+                json_data["email"], json_data["name"], json_data["last_name"], password_hash)
         return "User created successfully"
 
     def update_last_login(self, email: str):
@@ -82,4 +81,24 @@ class WWController:
         operation = "disabled" if json_data["status"] == "inactive" else "activated"
         return f"User {operation} successfully"
 
+    def update_user_roles(self, email:str, operation: str, json_data: dict): 
+        """Main function to update user roles"""
+        user_data = self.get_user_data_by_email(email)
+        print('user data')
+        print(user_data)
+        print('json')
+        print(json_data)
+        if not user_data: 
+            raise ResourceNotFoundException("User not found")
+        if operation == "remove":
+            if not json_data["role"] in user_data["roles"]:
+                raise ResourceNotFoundException("Role not found in user")
+            user_data["roles"].remove(json_data["role"])
+        else:
+            if json_data["role"] in user_data["roles"]:
+                raise ResourceAlreadyExistsException("Role was already assigned")
+            user_data["roles"].append(json_data["role"])
+        self.database.update_user_data(email, {"roles": user_data["roles"]})
+        word = "removed" if operation == "remove" else "assigned"
+        return f"Role {word} successfully"
 

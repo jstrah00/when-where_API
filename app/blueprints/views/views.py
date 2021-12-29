@@ -4,6 +4,7 @@ from flask import Blueprint, request
 import app
 from app.resources.utilities import validate_json_schema
 from app.resources.schemas.users_schemas import create_user_schema, authenticate_user_schema, update_user_schema, update_user_status_schema
+from app.resources.schemas.roles_schemas import add_remove_user_roles_schema
 
 views = Blueprint("views", __name__)
 
@@ -71,3 +72,24 @@ def update_user_status(email):
     json_data = request.get_json(force = True)
     validate_json_schema(json_data, update_user_status_schema)
     return app.controller.update_user_status(email, json_data)
+
+@views.route("/users/<string:email>/roles", methods=["PUT"])
+@basic_decorator
+@token_required
+@roles_required(["admin"])
+def add_roles_to_user(email):
+    """Add roles to user by email"""
+    json_data = request.get_json(force = True)
+    validate_json_schema(json_data, add_remove_user_roles_schema)
+    return app.controller.update_user_roles(email, "add", json_data)
+
+@views.route("/users/<string:email>/roles", methods=["PATCH"])
+@basic_decorator
+@token_required
+@roles_required(["admin"])
+def remove_roles_to_user(email):
+    """Remove roles to user by email"""
+    json_data = request.get_json(force = True)
+    validate_json_schema(json_data, add_remove_user_roles_schema)
+    return app.controller.update_user_roles(email, "remove", json_data)
+
