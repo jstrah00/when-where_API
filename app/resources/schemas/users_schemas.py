@@ -7,10 +7,10 @@ create_user_schema = {
     "default": {},
     "examples": [
         {
-            "email": "julianstrah2@gmail.com",
+            "email": "julianstrahdd@gmail.com",
             "name": "Julian",
             "last_name": "Strah",
-            "password": "Contrasena123"
+            "password": "MiliTeAmo"
         }
     ],
     "required": [
@@ -26,9 +26,8 @@ create_user_schema = {
             "title": "The email schema",
             "description": "An explanation about the purpose of this instance.",
             "default": "",
-            "pattern": "^\S+@\S+\.\S+$",
             "examples": [
-                "julianstrah2@gmail.com"
+                "julianstrahdd@gmail.com"
             ]
         },
         "name": {
@@ -57,9 +56,8 @@ create_user_schema = {
             "title": "The password schema",
             "description": "An explanation about the purpose of this instance.",
             "default": "",
-            "minLength": 6,
             "examples": [
-                "Contrasena123"
+                "MiliTeAmo"
             ]
         }
     },
@@ -117,29 +115,15 @@ update_user_schema = {
     "default": {},
     "examples": [
         {
-            "email": "julianstrah@gmail.com",
             "first_name": "Juli",
-            "last_name": "Strah",
-            "role": "admin"
+            "last_name": "Strah"
         }
     ],
     "required": [
-        "email",
         "first_name",
-        "last_name",
-        "role"
+        "last_name"
     ],
     "properties": {
-        "email": {
-            "$id": "#/properties/email",
-            "type": "string",
-            "title": "The email schema",
-            "description": "An explanation about the purpose of this instance.",
-            "default": "",
-            "examples": [
-                "julianstrah@gmail.com"
-            ]
-        },
         "first_name": {
             "$id": "#/properties/first_name",
             "type": "string",
@@ -159,16 +143,40 @@ update_user_schema = {
             "examples": [
                 "Strah"
             ]
-        },
-        "role": {
-            "$id": "#/properties/role",
-            "type": "string",
-            "title": "The role schema",
-            "description": "An explanation about the purpose of this instance.",
+        }
+    },
+    "additionalProperties": True
+} 
+
+update_user_status_schema = {
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "$id": "http://example.com/example.json",
+    "type": "object",
+    "title": "The root schema",
+    "description": "The root schema comprises the entire JSON document.",
+    "default": {},
+    "examples": [
+        {
+            "status": "active"
+        }
+    ],
+    "required": [
+        "status"
+    ],
+    "properties": {
+        "status": {
+            "$id": "#/properties/status",
             "default": "",
+            "description": "An explanation about the purpose of this instance.",
+            "enum": [
+                "active",
+                "inactive"
+            ],
             "examples": [
-                "admin"
-            ]
+                "active"
+            ],
+            "title": "The status schema",
+            "type": "string"
         }
     },
     "additionalProperties": True
