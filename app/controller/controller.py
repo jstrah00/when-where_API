@@ -1,8 +1,9 @@
 import bcrypt
 import jwt
 import datetime
-from app.resources.credentials import JWT_SECRET
-from app.resources.exceptions import ResourceAlreadyExistsException, ResourceNotFoundException, UnauthorizedAccessException
+from jwt.exceptions import InvalidSignatureError, ExpiredSignatureError
+from app.resources.credentials import JWT_SECRET, VERIF_EMAIL_TOKEN_SECRET
+from app.resources.exceptions import ResourceAlreadyExistsException, ResourceNotFoundException, UnauthorizedAccessException, BadAuthorizationException
 
 class WWController:
     def __init__(self, database):
@@ -28,6 +29,7 @@ class WWController:
 
     def create_user(self, json_data: dict): 
         """Main fuction for create user endpoint"""
+        #AGREGAR ACA: QUE VERIFIQUE CON ALGUNA LIB QUE SEA UN EMAIL VALIDO
         if self.database.get_user_data_by_email(json_data["email"]):
             raise ResourceAlreadyExistsException("User already exists")
         password = json_data["password"].encode("utf-8")
@@ -48,6 +50,7 @@ class WWController:
                 "last_name": user["last_name"],
                 "roles": user["roles"],
                 "last_login": user["last_login"],
+                "email_verified": user["email_verified"],
                 "status": user["status"]
                 }
 
@@ -84,10 +87,6 @@ class WWController:
     def update_user_roles(self, email:str, operation: str, json_data: dict): 
         """Main function to update user roles"""
         user_data = self.get_user_data_by_email(email)
-        print('user data')
-        print(user_data)
-        print('json')
-        print(json_data)
         if not user_data: 
             raise ResourceNotFoundException("User not found")
         if operation == "remove":
@@ -102,3 +101,26 @@ class WWController:
         word = "removed" if operation == "remove" else "assigned"
         return f"Role {word} successfully"
 
+    def generate_email_verification_code(self, email):
+        """Main function to generate a code to the email verification process"""
+        user_data = self.database.get_user_data_by_email(email)
+        if not user_data: 
+            raise ResourceNotFoundException("User not found")
+        if user_data["status"] == "active":
+            code = jwt.encode({
+                "email": user_data["email"],
+                "exp" : datetime.datetime.utcnow() + datetime.timedelta(days=15)
+                }, VERIF_EMAIL_TOKEN_SECRET, "HS256")
+            return {"verification_code" : code} #ESTO CAMBIARLO, EN VEZ DE DEVOLVERLO EN LA REQUEST TIENE QUE ENVIAR EL MAIL CON EL CODIGO
+        raise UnauthorizedAccessException("Cant generate a code for inactive user")
+
+    def verify_email(self, json_data: dict):
+        try:
+            jwt_data = jwt.decode(json_data["code"], VERIF_EMAIL_TOKEN_SECRET, algorithms=["HS256"])
+        except InvalidSignatureError:
+            raise BadAuthorizationException("Invalid token")
+        except ExpiredSignatureError:
+            raise BadAuthorizationException("Expired token")
+        else:
+            self.database.update_user_data(jwt_data["email"], {"email_verified": True})
+        return "Email verified successfully"
