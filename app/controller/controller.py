@@ -5,7 +5,7 @@ import datetime
 from jwt.exceptions import InvalidSignatureError, ExpiredSignatureError
 from app.resources.credentials import JWT_SECRET, VERIF_EMAIL_TOKEN_SECRET
 from app.resources.exceptions import ResourceAlreadyExistsException, ResourceNotFoundException, UnauthorizedAccessException, BadAuthorizationException, InvalidEmailException
-
+from app.resources.email import send_verification_email
 email_regex = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
 
 class WWController:
@@ -110,13 +110,14 @@ class WWController:
         user_data = self.database.get_user_data_by_email(email)
         if not user_data: 
             raise ResourceNotFoundException("User not found")
-        if user_data["status"] == "active":
-            code = jwt.encode({
-                "email": user_data["email"],
-                "exp" : datetime.datetime.utcnow() + datetime.timedelta(days=15)
-                }, VERIF_EMAIL_TOKEN_SECRET, "HS256")
-            return {"verification_code" : code} #ESTO CAMBIARLO, EN VEZ DE DEVOLVERLO EN LA REQUEST TIENE QUE ENVIAR EL MAIL CON EL CODIGO
-        raise UnauthorizedAccessException("Cant generate a code for inactive user")
+        if not user_data["status"] == "active":
+            raise UnauthorizedAccessException("Cant generate a code for inactive user")
+        code = jwt.encode({
+            "email": user_data["email"],
+            "exp" : datetime.datetime.utcnow() + datetime.timedelta(days=15)
+            }, VERIF_EMAIL_TOKEN_SECRET, "HS256")
+        send_verification_email(email, code)
+        return "Verification code successfully sent."
 
     def verify_email(self, json_data: dict):
         try:
