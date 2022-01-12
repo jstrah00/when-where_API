@@ -1,9 +1,12 @@
 import bcrypt
 import jwt
+import re
 import datetime
 from jwt.exceptions import InvalidSignatureError, ExpiredSignatureError
 from app.resources.credentials import JWT_SECRET, VERIF_EMAIL_TOKEN_SECRET
-from app.resources.exceptions import ResourceAlreadyExistsException, ResourceNotFoundException, UnauthorizedAccessException, BadAuthorizationException
+from app.resources.exceptions import ResourceAlreadyExistsException, ResourceNotFoundException, UnauthorizedAccessException, BadAuthorizationException, InvalidEmailException
+
+email_regex = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
 
 class WWController:
     def __init__(self, database):
@@ -29,9 +32,10 @@ class WWController:
 
     def create_user(self, json_data: dict): 
         """Main fuction for create user endpoint"""
-        #AGREGAR ACA: QUE VERIFIQUE CON ALGUNA LIB QUE SEA UN EMAIL VALIDO
         if self.database.get_user_data_by_email(json_data["email"]):
             raise ResourceAlreadyExistsException("User already exists")
+        if not re.fullmatch(email_regex, json_data["email"]):
+            raise InvalidEmailException
         password = json_data["password"].encode("utf-8")
         password_hash = bcrypt.hashpw(password, bcrypt.gensalt())
         self.database.create_user(

@@ -28,3 +28,8 @@ class UnauthorizedAccessException(Exception):
     def get_status_code(self) -> int:
         return self.__status_code
 
+class InvalidEmailException(Exception):
+    def __init__(self, message: str = "The provided email is invalid") -> None:
+        self.__status_code = 500
+    def get_status_code(self) -> int:
+        return self.__status_code
