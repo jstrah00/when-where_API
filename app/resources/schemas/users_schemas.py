@@ -181,3 +181,45 @@ update_user_status_schema = {
     },
     "additionalProperties": True
 }
+
+change_password_schema = {
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "$id": "http://example.com/example.json",
+    "type": "object",
+    "title": "The root schema",
+    "description": "The root schema comprises the entire JSON document.",
+    "default": {},
+    "examples": [
+        {
+            "code": "mycode1234",
+            "password": "mypassword123"
+        }
+    ],
+    "required": [
+        "code",
+        "password"
+    ],
+    "properties": {
+        "code": {
+            "$id": "#/properties/code",
+            "type": "string",
+            "title": "The code schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": "",
+            "examples": [
+                "mycode1234"
+            ]
+        },
+        "password": {
+            "$id": "#/properties/password",
+            "type": "string",
+            "title": "The password schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": "",
+            "examples": [
+                "mypassword123"
+            ]
+        }
+    },
+    "additionalProperties": True
+}
