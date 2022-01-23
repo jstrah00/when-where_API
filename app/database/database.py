@@ -15,6 +15,7 @@ class Database:
             "hashed_password": hashed_password,
             "last_login": None,
             "roles": [],
+            "email_verified": False,
             "status": "active"
             })
 
@@ -28,4 +29,5 @@ class Database:
         return self.db.users.update_one(
                 {"email": email},
                 {"$set": payload})
+
 

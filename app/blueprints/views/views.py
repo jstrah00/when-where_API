@@ -5,6 +5,7 @@ import app
 from app.resources.utilities import validate_json_schema
 from app.resources.schemas.users_schemas import create_user_schema, authenticate_user_schema, update_user_schema, update_user_status_schema
 from app.resources.schemas.roles_schemas import add_remove_user_roles_schema
+from app.resources.schemas.email_verification_schemas import verify_email_schema
 
 views = Blueprint("views", __name__)
 
@@ -93,3 +94,22 @@ def remove_roles_to_user(email):
     validate_json_schema(json_data, add_remove_user_roles_schema)
     return app.controller.update_user_roles(email, "remove", json_data)
 
+@views.route("/users/<string:email>/verification_email", methods=["POST"])
+@basic_decorator
+@token_required
+@roles_required(["admin","self"])
+def send_verification_email(email):
+    """Send verification email"""
+    lang = request.args.get("lang", default="es", type=str)
+    return app.controller.generate_email_verification_code(email, lang)
+
+
+@views.route("/users/<string:email>/verify", methods=["POST"])
+@basic_decorator
+@token_required
+@roles_required(["admin","self"])
+def verify_email(email):
+    """Verify email"""
+    json_data = request.get_json(force = True)
+    validate_json_schema(json_data, verify_email_schema)
+    return app.controller.verify_email(json_data, email)
