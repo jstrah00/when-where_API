@@ -100,15 +100,16 @@ def remove_roles_to_user(email):
 @roles_required(["admin","self"])
 def send_verification_email(email):
     """Send verification email"""
-    return app.controller.generate_email_verification_code(email)
+    lang = request.args.get("lang", default="es", type=str)
+    return app.controller.generate_email_verification_code(email, lang)
 
 
-@views.route("/users/verify", methods=["POST"])
+@views.route("/users/<string:email>/verify", methods=["POST"])
 @basic_decorator
 @token_required
 @roles_required(["admin","self"])
-def send_verification_email():
+def verify_email(email):
     """Verify email"""
     json_data = request.get_json(force = True)
     validate_json_schema(json_data, verify_email_schema)
-    return app.controller.verify_email(json_data)
+    return app.controller.verify_email(json_data, email)
