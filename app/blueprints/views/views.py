@@ -3,7 +3,7 @@ from app.resources.decorators import token_required, basic_decorator, roles_requ
 from flask import Blueprint, request
 import app
 from app.resources.utilities import validate_json_schema
-from app.resources.schemas.users_schemas import create_user_schema, authenticate_user_schema, update_user_schema, update_user_status_schema
+from app.resources.schemas.users_schemas import create_user_schema, authenticate_user_schema, update_user_schema, update_user_status_schema, change_password_schema
 from app.resources.schemas.roles_schemas import add_remove_user_roles_schema
 from app.resources.schemas.email_verification_schemas import verify_email_schema
 
@@ -113,3 +113,24 @@ def verify_email(email):
     json_data = request.get_json(force = True)
     validate_json_schema(json_data, verify_email_schema)
     return app.controller.verify_email(json_data, email)
+
+@views.route("/users/<string:email>/forgot_password", methods=["POST"])
+@basic_decorator
+@token_required
+@roles_required(["admin","self"])
+def send_change_password_email(email):
+    """Send change password email"""
+    lang = request.args.get("lang", default="es", type=str)
+    return app.controller.generate_reset_password_code(email, lang)
+
+
+@views.route("/users/<string:email>/change_password", methods=["POST"])
+@basic_decorator
+@token_required
+@roles_required(["admin","self"])
+def change_password(email):
+    """Change password"""
+    json_data = request.get_json(force = True)
+    lang = request.args.get("lang", default="es", type=str)
+    validate_json_schema(json_data, change_password_schema)
+    return app.controller.change_password(json_data, email, lang)

@@ -13,6 +13,7 @@ if os.getenv("ENV") == "production":
     EMAIL_PASSWORD = os.getenv("EMAIL_PASSWORD")
     APP_NAME = os.getenv("APP_NAME")
     APP_URL = os.getenv("APP_URL")
+    SUPPORT_EMAIL = os.getenv("SUPPORT_EMAIL")
 else:
     DB_CONNECTION_URL = os.getenv("DEV_DB_CONN")
     DB_NAME = os.getenv("DEV_DB_NAME")
@@ -23,3 +24,4 @@ else:
     EMAIL_PASSWORD = os.getenv("DEV_EMAIL_PASSWORD")
     APP_NAME = os.getenv("DEV_APP_NAME")
     APP_URL = os.getenv("DEV_APP_URL")
+    SUPPORT_EMAIL = os.getenv("DEV_SUPPORT_EMAIL")

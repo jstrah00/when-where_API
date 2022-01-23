@@ -5,7 +5,8 @@ import datetime
 from jwt.exceptions import InvalidSignatureError, ExpiredSignatureError
 from app.resources.credentials import JWT_SECRET, VERIF_EMAIL_TOKEN_SECRET
 from app.resources.exceptions import ResourceAlreadyExistsException, ResourceNotFoundException, UnauthorizedAccessException, BadAuthorizationException, InvalidEmailException
-from app.resources.email import send_verification_email
+from app.resources.email import send_verification_email, send_change_password_email, send_password_change_alert
+
 email_regex = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
 
 class WWController:
@@ -133,3 +134,35 @@ class WWController:
                 raise BadAuthorizationException("Invalid token")
             self.database.update_user_data(jwt_data["email"], {"email_verified": True})
         return "Email verified successfully"
+
+    def generate_reset_password_code(self, email, lang="es"):
+        """Main function to generate a code to the reset password process"""
+        user_data = self.database.get_user_data_by_email(email)
+        if not user_data: 
+            raise ResourceNotFoundException("User not found")
+        if not user_data["status"] == "active":
+            raise UnauthorizedAccessException("Cant generate a code for inactive user")
+        if not user_data["email_verified"]:
+            raise UnauthorizedAccessException("Cant generate a code for a not verified email")
+        code = jwt.encode({
+            "email": user_data["email"],
+            "exp" : datetime.datetime.utcnow() + datetime.timedelta(minutes=45)
+            }, JWT_SECRET, "HS256")
+        send_change_password_email(email, code, lang)
+        return "Change password email successfully sent."
+
+    def change_password(self, json_data: dict, email, lang="es"):
+        try:
+            jwt_data = jwt.decode(json_data["code"], JWT_SECRET, algorithms=["HS256"])
+        except InvalidSignatureError:
+            raise BadAuthorizationException("Invalid token")
+        except ExpiredSignatureError:
+            raise BadAuthorizationException("Expired token")
+        else:
+            if jwt_data["email"] != email:
+                raise BadAuthorizationException("Invalid token")
+            password = json_data["password"].encode("utf-8")
+            password_hash = bcrypt.hashpw(password, bcrypt.gensalt())
+            self.database.update_user_data(jwt_data["email"], {"hashed_password": password_hash})
+            send_password_change_alert(email, lang)
+        return "Password changed successfully"
